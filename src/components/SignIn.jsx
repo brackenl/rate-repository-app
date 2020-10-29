@@ -1,9 +1,12 @@
 import React from "react";
 import { View, Text, TouchableWithoutFeedback, StyleSheet } from "react-native";
+import { useHistory } from "react-router-native";
 import { Formik } from "formik";
 import * as yup from "yup";
 
 import FormikTextInput from "./FormikTextInput";
+import useSignIn from "../hooks/useSignIn";
+
 import theme from "../theme";
 
 const styles = StyleSheet.create({
@@ -40,10 +43,6 @@ const validationSchema = yup.object().shape({
     .required("Password is required"),
 });
 
-const onSubmit = (values) => {
-  console.log(values);
-};
-
 const initialValues = {
   username: "",
   password: "",
@@ -55,13 +54,28 @@ const SignInForm = ({ onSubmit }) => {
       <FormikTextInput name="username" placeholder="Username" />
       <FormikTextInput name="password" placeholder="Password" secureTextEntry />
       <TouchableWithoutFeedback onPress={onSubmit}>
-        <Text style={styles.submit}>Log in</Text>
+        <View>
+          <Text style={styles.submit}>Log in</Text>
+        </View>
       </TouchableWithoutFeedback>
     </View>
   );
 };
 
 const SignIn = () => {
+  const [signIn] = useSignIn();
+  let history = useHistory();
+
+  const onSubmit = async (values) => {
+    const { username, password } = values;
+
+    try {
+      await signIn({ username, password });
+      history.push("/");
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
     <View>
       <Formik

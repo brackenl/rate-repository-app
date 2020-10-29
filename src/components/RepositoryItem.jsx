@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
   headingBox: {
     paddingVertical: 2,
     paddingLeft: 10,
+    paddingRight: 2,
     flexDirection: "row",
     flex: 1,
     flexWrap: "wrap",
