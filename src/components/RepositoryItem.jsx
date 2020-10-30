@@ -82,7 +82,9 @@ const RepositoryItem = ({
           }}
         >
           <View style={styles.headingBox}>
-            <Text style={styles.fullName}>{fullName}</Text>
+            <Text style={styles.fullName} testID="fullName">
+              {fullName}
+            </Text>
           </View>
           <View style={styles.headingBox}>
             <Text style={styles.secondary}>{description}</Text>
