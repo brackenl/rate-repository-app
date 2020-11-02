@@ -3,8 +3,6 @@ import { render } from "@testing-library/react-native";
 
 import RepositoryListContainer from "../components/RepositoryListContainer";
 
-jest.mock("ScrollView", () => jest.requireMock("ScrollViewMock"));
-
 describe("RepositoryList", () => {
   describe("RepositoryListContainer", () => {
     it("renders repository information correctly", () => {
@@ -51,58 +49,29 @@ describe("RepositoryList", () => {
         ],
       };
 
+      const repositoryNodes = repositories.edges.map((edge) => edge.node);
+
       // Add your test code here
 
-      const { debug, getAllByTestId } = render(
-        <RepositoryListContainer repositories={repositories} />
+      const { getAllByTestId } = render(
+        <RepositoryListContainer repositories={repositoryNodes} />
       );
 
-      debug();
-
       const repositoryNames = getAllByTestId("fullName");
-      /*
-      const repositoryDescriptions = getAllByTestId("repositoryDescription");
-      const repositoryLanguages = getAllByTestId("repositoryLanguage");
-      const repositoryForks = getAllByTestId("repositoryForks");
-      const repositoryStars = getAllByTestId("repositoryStars");
-      const repositoryRatings = getAllByTestId("repositoryRating");
-      const repositoryReviews = getAllByTestId("repositoryReviews");
-      */
+      const respositoryDescs = getAllByTestId("description");
+      const repositoryLangs = getAllByTestId("language");
 
-      repositoryNames.forEach((name, i) => {
-        expect(name).toHaveTextContent(repositories.edges[i].node.name);
-      });
+      repositoryNames.forEach((name, i) =>
+        expect(name).toHaveTextContent(repositories.edges[i].node.fullName)
+      );
 
-      /*
-      repositoryDescriptions.forEach((description, i) => {
-        expect(description).toHaveTextContent(
-          repositories.edges[i].node.description
-        );
-      });
-      repositoryLanguages.forEach((language, i) => {
-        expect(language).toHaveTextContent(repositories.edges[i].node.language);
-      });
-      repositoryForks.forEach((forks, i) => {
-        expect(forks).toHaveTextContent(
-          formatValue(repositories.edges[i].node.forksCount)
-        );
-      });
-      repositoryStars.forEach((stars, i) => {
-        expect(stars).toHaveTextContent(
-          formatValue(repositories.edges[i].node.stargazersCount)
-        );
-      });
-      repositoryRatings.forEach((rating, i) => {
-        expect(rating).toHaveTextContent(
-          formatValue(repositories.edges[i].node.ratingAverage)
-        );
-      });
-      repositoryReviews.forEach((review, i) => {
-        expect(review).toHaveTextContent(
-          formatValue(repositories.edges[i].node.reviewCount)
-        );
-      });
-      */
+      respositoryDescs.forEach((desc, i) =>
+        expect(desc).toHaveTextContent(repositories.edges[i].node.description)
+      );
+
+      repositoryLangs.forEach((lang, i) =>
+        expect(lang).toHaveTextContent(repositories.edges[i].node.language)
+      );
     });
   });
 });

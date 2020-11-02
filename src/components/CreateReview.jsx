@@ -5,7 +5,8 @@ import { Formik } from "formik";
 import * as yup from "yup";
 
 import FormikTextInput from "./FormikTextInput";
-import useSignIn from "../hooks/useSignIn";
+import FormikNumInput from "./FormikNumInput";
+import useCreateReview from "../hooks/useCreateReview";
 
 import theme from "../theme";
 
@@ -34,54 +35,80 @@ const styles = StyleSheet.create({
 });
 
 const validationSchema = yup.object().shape({
-  username: yup
+  repoOwner: yup
     .string()
     .min(3, `Username must be at least 3 characters`)
     .required("Username is required"),
-  password: yup
+  repoName: yup
     .string()
-    .min(5, `Password must be at least 5 characters`)
-    .required("Password is required"),
+    .min(3, `Repository name must be at least 3 characters`)
+    .required("Repository name is required"),
+  rating: yup
+    .number()
+    .min(0, "Rating must be between 0 and 100")
+    .max(100, "Rating must be between 0 and 100")
+    .required("Rating is required"),
 });
 
 const initialValues = {
-  username: "",
-  password: "",
+  repoOwner: "",
+  repoName: "",
+  rating: "",
+  review: "",
 };
 
-export const SignInForm = ({ onSubmit }) => {
+export const CreateReviewForm = ({ onSubmit }) => {
   return (
     <View>
       <FormikTextInput
-        name="username"
-        placeholder="Username"
+        name="repoOwner"
+        placeholder="Repository owner Github username"
         testID="usernameField"
       />
       <FormikTextInput
-        name="password"
-        placeholder="Password"
-        secureTextEntry
-        testID="passwordField"
+        name="repoName"
+        placeholder="Repository Name"
+        testID="repoNameField"
       />
+
+      <FormikNumInput
+        name="rating"
+        placeholder="Rating (0 - 100)"
+        testID="ratingField"
+      />
+
+      <FormikTextInput
+        name="review"
+        placeholder="Review"
+        testID="reviewField"
+        multiline
+        numberOfLines={3}
+      />
+
       <TouchableWithoutFeedback onPress={onSubmit} testID="submitBttn">
         <View>
-          <Text style={styles.submit}>Log in</Text>
+          <Text style={styles.submit}>Create a review</Text>
         </View>
       </TouchableWithoutFeedback>
     </View>
   );
 };
 
-const SignIn = () => {
-  const [signIn] = useSignIn();
+const CreateReview = () => {
+  const [createReview] = useCreateReview();
   let history = useHistory();
 
   const onSubmit = async (values) => {
-    const { username, password } = values;
-
+    const { repoOwner, repoName, rating, review } = values;
+    const ratingAsInt = Number(rating);
     try {
-      await signIn({ username, password });
-      history.push("/");
+      const data = await createReview({
+        repoOwner,
+        repoName,
+        ratingAsInt,
+        review,
+      });
+      history.push(`/repo/${data.createReview.repository.id}`);
     } catch (err) {
       console.log(err);
     }
@@ -93,10 +120,10 @@ const SignIn = () => {
         onSubmit={onSubmit}
         validationSchema={validationSchema}
       >
-        {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
+        {({ handleSubmit }) => <CreateReviewForm onSubmit={handleSubmit} />}
       </Formik>
     </View>
   );
 };
 
-export default SignIn;
+export default CreateReview;

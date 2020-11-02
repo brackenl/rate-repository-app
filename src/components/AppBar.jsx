@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
     paddingTop: Constants.statusBarHeight,
     backgroundColor: theme.colors.appBar,
     flexDirection: "row",
-    justifyContent: "flex-start",
   },
   text: {
     color: "white",
@@ -31,49 +30,69 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingLeft: 5,
   },
+  appBarItem: {
+    marginRight: 10,
+  },
 });
 
 const AppBar = () => {
   const authStorage = useContext(AuthStorageContext);
   const client = useApolloClient();
-  const { data, error, loading } = useQuery(VERIFY_AUTH_USER);
-
-  useQuery(VERIFY_AUTH_USER, {
+  let { data } = useQuery(VERIFY_AUTH_USER, {
     fetchPolicy: "cache-and-network",
     // Other options
   });
 
   const signOut = async () => {
-    await authStorage.removeAccessToken(); // update??
+    console.log("clicked");
+    await authStorage.removeAccessToken();
     client.resetStore();
   };
 
   let signIn = (
-    <TouchableWithoutFeedback>
-      <Link to="/signin" component={TouchableOpacity}>
-        <Text style={styles.text}>Sign In</Text>
-      </Link>
-    </TouchableWithoutFeedback>
+    <>
+      <TouchableWithoutFeedback>
+        <Link to="/signin" component={TouchableOpacity}>
+          <Text style={[styles.text, styles.appBarItem]}>Sign In</Text>
+        </Link>
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback>
+        <Link to="/signup" component={TouchableOpacity}>
+          <Text style={[styles.text, styles.appBarItem]}>Sign Up</Text>
+        </Link>
+      </TouchableWithoutFeedback>
+    </>
   );
 
   if (data && data.authorizedUser) {
     signIn = (
-      <TouchableWithoutFeedback onPress={signOut}>
-        <View>
-          <Text style={styles.text}>Sign Out</Text>
-        </View>
-      </TouchableWithoutFeedback>
+      <>
+        <TouchableWithoutFeedback>
+          <Link to="/review" component={TouchableOpacity}>
+            <Text style={[styles.text, styles.appBarItem]}>Review</Text>
+          </Link>
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback onPress={signOut}>
+          <View>
+            <Text style={[styles.text, styles.appBarItem]}>Sign Out</Text>
+          </View>
+        </TouchableWithoutFeedback>
+      </>
     );
   }
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal>
+      <ScrollView
+        horizontal
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "flex-start" }}
+      >
         <TouchableWithoutFeedback>
           <Link to="/" component={TouchableOpacity}>
-            <Text style={styles.text}>Repositories</Text>
+            <Text style={[styles.text, styles.appBarItem]}>Repositories</Text>
           </Link>
         </TouchableWithoutFeedback>
+
         {signIn}
       </ScrollView>
     </View>

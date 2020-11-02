@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
 });
 
 const RepositoryItem = ({
+  id,
   ownerAvatarUrl,
   fullName,
   description,
@@ -59,8 +60,8 @@ const RepositoryItem = ({
   reviewCount,
 }) => {
   return (
-    <View>
-      <View style={{ flexDirection: "row", flex: 1 }}>
+    <View testID={id} style={{ backgroundColor: "white" }}>
+      <View style={{ flexDirection: "row" }}>
         <View
           style={{
             justifyContent: "flex-start",
@@ -87,10 +88,14 @@ const RepositoryItem = ({
             </Text>
           </View>
           <View style={styles.headingBox}>
-            <Text style={styles.secondary}>{description}</Text>
+            <Text style={styles.secondary} testID="description">
+              {description}
+            </Text>
           </View>
           <View style={[styles.headingBox, { flexDirection: "row" }]}>
-            <Text style={styles.language}>{language}</Text>
+            <Text style={styles.language} testID="language">
+              {language}
+            </Text>
           </View>
         </View>
       </View>

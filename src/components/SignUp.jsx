@@ -5,6 +5,7 @@ import { Formik } from "formik";
 import * as yup from "yup";
 
 import FormikTextInput from "./FormikTextInput";
+import useSignUp from "../hooks/useSignUp";
 import useSignIn from "../hooks/useSignIn";
 
 import theme from "../theme";
@@ -37,19 +38,26 @@ const validationSchema = yup.object().shape({
   username: yup
     .string()
     .min(3, `Username must be at least 3 characters`)
+    .max(30, "Username cannot be longer than 30 characters")
     .required("Username is required"),
   password: yup
     .string()
     .min(5, `Password must be at least 5 characters`)
+    .max(50, "Password cannot be longer than 50 characters")
     .required("Password is required"),
+  passwordConfirm: yup
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords must match")
+    .required("You must confirm your password"),
 });
 
 const initialValues = {
   username: "",
   password: "",
+  passwordConfirm: "",
 };
 
-export const SignInForm = ({ onSubmit }) => {
+export const SignUpForm = ({ onSubmit }) => {
   return (
     <View>
       <FormikTextInput
@@ -63,6 +71,12 @@ export const SignInForm = ({ onSubmit }) => {
         secureTextEntry
         testID="passwordField"
       />
+      <FormikTextInput
+        name="passwordConfirm"
+        placeholder="Confirm Password"
+        secureTextEntry
+        testID="passwordConfirmField"
+      />
       <TouchableWithoutFeedback onPress={onSubmit} testID="submitBttn">
         <View>
           <Text style={styles.submit}>Log in</Text>
@@ -72,7 +86,8 @@ export const SignInForm = ({ onSubmit }) => {
   );
 };
 
-const SignIn = () => {
+const SignUp = () => {
+  const [signUp] = useSignUp();
   const [signIn] = useSignIn();
   let history = useHistory();
 
@@ -80,8 +95,14 @@ const SignIn = () => {
     const { username, password } = values;
 
     try {
-      await signIn({ username, password });
-      history.push("/");
+      await signUp({ username, password });
+
+      try {
+        await signIn({ username, password });
+        history.push("/");
+      } catch (err) {
+        console.log(err);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -93,10 +114,10 @@ const SignIn = () => {
         onSubmit={onSubmit}
         validationSchema={validationSchema}
       >
-        {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
+        {({ handleSubmit }) => <SignUpForm onSubmit={handleSubmit} />}
       </Formik>
     </View>
   );
 };
 
-export default SignIn;
+export default SignUp;
