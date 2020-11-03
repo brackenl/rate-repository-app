@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
-const RepositoryListContainer = ({ repositories }) => {
+const RepositoryListContainer = ({ repositories, onEndReach }) => {
   let history = useHistory();
 
   const renderItem = ({ item }) => {
@@ -46,6 +46,8 @@ const RepositoryListContainer = ({ repositories }) => {
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         testID="testy"
+        onEndReached={onEndReach}
+        onEndReachedThreshold={0.5}
       />
     </View>
   );

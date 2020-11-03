@@ -7,11 +7,10 @@ import {
   FlatList,
 } from "react-native";
 import { useParams } from "react-router-native";
-import { useQuery } from "@apollo/react-hooks";
 import * as Linking from "expo-linking";
 import { format } from "date-fns";
 
-import { GET_ONE_REPO } from "../graphql/queries";
+import useReviews from "../hooks/useReviews";
 
 import RepositoryItem from "./RepositoryItem";
 
@@ -108,12 +107,14 @@ const ItemSeparator = () => <View style={styles.separator} />;
 const SingleRepoView = () => {
   const { repo } = useParams();
 
-  const { data, loading, error } = useQuery(GET_ONE_REPO, {
-    fetchPolicy: "cache-and-network",
-    variables: {
-      id: repo,
-    },
+  const { repository, reviews, fetchMore, loading } = useReviews({
+    first: 4,
+    id: repo,
   });
+
+  const onEndReach = () => {
+    fetchMore();
+  };
 
   if (loading) {
     return (
@@ -121,22 +122,19 @@ const SingleRepoView = () => {
         <Text>Loading...</Text>
       </View>
     );
-  } else if (error) {
-    console.log(error);
   }
 
-  const reviews = data.repository.reviews.edges.map((edge) => edge.node);
+  const reviewNodes = reviews.edges.map((edge) => edge.node);
 
   return (
     <FlatList
-      data={reviews}
+      data={reviewNodes}
       ItemSeparatorComponent={ItemSeparator}
       renderItem={({ item }) => <ReviewItem review={item} />}
       keyExtractor={({ id }) => id}
-      ListHeaderComponent={() => (
-        <RepositoryInfo repository={data.repository} />
-      )}
-      // ...
+      ListHeaderComponent={() => <RepositoryInfo repository={repository} />}
+      onEndReached={onEndReach}
+      onEndReachedThreshold={0.5}
     />
   );
 };

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import { useLazyQuery } from "@apollo/react-hooks";
 import RNPickerSelect from "react-native-picker-select";
 import { Searchbar } from "react-native-paper";
 import { useDebounce } from "use-debounce";
 
-import { GET_REPOSITORIES } from "../graphql/queries";
+import useRepositories from "../hooks/useRepositories";
 
 import RepositoryListContainer from "./RepositoryListContainer";
 
@@ -29,57 +28,64 @@ const pickerSelectStyles = StyleSheet.create({
 });
 
 const RepositoryList = () => {
-  let variables = { orderBy: "RATING_AVERAGE", orderDirection: "DESC" };
-  const [getRepos, { data }] = useLazyQuery(GET_REPOSITORIES, {
-    variables: variables,
+  const [sort, setSort] = useState("oldest");
+  const [variables, setVariables] = useState({
+    orderBy: "RATING_AVERAGE",
+    orderDirection: "DESC",
+    searchKeyword: "",
   });
 
-  const [sort, setSort] = useState("oldest");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 500);
 
   const onChangeSearch = (query) => setSearchQuery(query);
 
+  const { repositories, fetchMore } = useRepositories({
+    first: 8,
+    ...variables,
+  });
+
   useEffect(() => {
-    console.log(sort, searchQuery);
     switch (sort) {
       case "oldest":
-        variables = {
+        setVariables({
           orderBy: "CREATED_AT",
           orderDirection: "DESC",
           searchKeyword: debouncedSearchQuery,
-        };
+        });
         break;
       case "latest":
-        variables = {
+        setVariables({
           orderBy: "CREATED_AT",
           orderDirection: "ASC",
           searchKeyword: debouncedSearchQuery,
-        };
+        });
         break;
       case "highestRated":
-        variables = {
+        setVariables({
           orderBy: "RATING_AVERAGE",
           orderDirection: "DESC",
           searchKeyword: debouncedSearchQuery,
-        };
+        });
         break;
       case "lowestRated":
-        variables = {
+        setVariables({
           orderBy: "RATING_AVERAGE",
           orderDirection: "ASC",
           searchKeyword: debouncedSearchQuery,
-        };
+        });
         break;
     }
-    console.log("variables: ", variables);
-    getRepos({ variables: variables });
   }, [sort, debouncedSearchQuery]);
+
+  const onEndReach = () => {
+    fetchMore();
+  };
 
   // Get the nodes from the edges array
   let repositoryNodes = [];
-  if (data) {
-    repositoryNodes = data.repositories.edges.map((edge) => edge.node);
+  if (repositories) {
+    repositoryNodes = repositories.edges.map((edge) => edge.node);
   }
 
   return (
@@ -103,7 +109,10 @@ const RepositoryList = () => {
         placeholder={{ label: "Sort by...", value: "latest" }}
         style={pickerSelectStyles}
       />
-      <RepositoryListContainer repositories={repositoryNodes} />
+      <RepositoryListContainer
+        repositories={repositoryNodes}
+        onEndReach={onEndReach}
+      />
     </>
   );
 };

@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/react-hooks";
 
 import { CREATE_REVIEW } from "../graphql/mutations";
 
-const useSignIn = () => {
+const useCreateReview = () => {
   const [mutate, result] = useMutation(CREATE_REVIEW);
 
   const createReview = async ({ repoOwner, repoName, ratingAsInt, review }) => {
@@ -20,4 +20,4 @@ const useSignIn = () => {
   return [createReview, result];
 };
 
-export default useSignIn;
+export default useCreateReview;

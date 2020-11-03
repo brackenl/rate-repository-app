@@ -5,6 +5,7 @@ const theme = {
     textPrimary: "#24292e",
     textSecondary: "#586069",
     primary: "#0366d6",
+    danger: "rgb(227,50,67)",
     appBar: "rgba(0, 0, 0, 0.8)",
   },
   fontSizes: {

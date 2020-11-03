@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { useQuery, useApolloClient } from "@apollo/react-hooks";
-import { Link } from "react-router-native";
+import { Link, useHistory } from "react-router-native";
 import Constants from "expo-constants";
 
 import AuthStorageContext from "../contexts/AuthStorageContext";
@@ -36,6 +36,9 @@ const styles = StyleSheet.create({
 });
 
 const AppBar = () => {
+  const [, setSignedIn] = useState(false);
+  const history = useHistory();
+
   const authStorage = useContext(AuthStorageContext);
   const client = useApolloClient();
   let { data } = useQuery(VERIFY_AUTH_USER, {
@@ -47,6 +50,8 @@ const AppBar = () => {
     console.log("clicked");
     await authStorage.removeAccessToken();
     client.resetStore();
+    setSignedIn(false);
+    history.push("/");
   };
 
   let signIn = (
@@ -63,13 +68,18 @@ const AppBar = () => {
       </TouchableWithoutFeedback>
     </>
   );
-
+  console.log(data);
   if (data && data.authorizedUser) {
     signIn = (
       <>
         <TouchableWithoutFeedback>
           <Link to="/review" component={TouchableOpacity}>
             <Text style={[styles.text, styles.appBarItem]}>Review</Text>
+          </Link>
+        </TouchableWithoutFeedback>
+        <TouchableWithoutFeedback>
+          <Link to="/myreviews" component={TouchableOpacity}>
+            <Text style={[styles.text, styles.appBarItem]}>My Reviews</Text>
           </Link>
         </TouchableWithoutFeedback>
         <TouchableWithoutFeedback onPress={signOut}>

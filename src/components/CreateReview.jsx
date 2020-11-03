@@ -96,7 +96,7 @@ export const CreateReviewForm = ({ onSubmit }) => {
 
 const CreateReview = () => {
   const [createReview] = useCreateReview();
-  let history = useHistory();
+  const history = useHistory();
 
   const onSubmit = async (values) => {
     const { repoOwner, repoName, rating, review } = values;
